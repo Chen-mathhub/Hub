@@ -1,0 +1,296 @@
+import base64
+import os
+
+# ================= 1. 配置区 =================
+output_filename = "hyperbola_prob3.html"
+page_title = "CHEN HUB：双曲线定值问题可视化"
+# 支持的 Logo 文件名
+possible_logos = ["中高考手搓数理化.jpg", "中高考手搓数理化.png", "logo.jpg", "logo.png"]
+# ============================================
+
+# --- Logo 处理 ---
+logo_src = ""
+current_dir = os.getcwd()
+for img in possible_logos:
+    img_path = os.path.join(current_dir, img)
+    if os.path.exists(img_path):
+        try:
+            with open(img_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode('utf-8')
+                ext = os.path.splitext(img)[1].lower()
+                mime = "image/png" if ext == ".png" else "image/jpeg"
+                logo_src = f"data:{mime};base64,{b64}"
+            print(f"✅ 已加载 Logo: {img}")
+            break
+        except Exception as e:
+            print(f"⚠️ Logo 加载失败: {e}")
+
+# --- HTML 核心模板 ---
+html_content = r"""
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>__PAGE_TITLE__</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow: hidden; }
+        
+        /* 滑块样式 */
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%; background: #2563eb; margin-top: -7px; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #cbd5e1; border-radius: 2px; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        
+        .brand-text { font-family: Impact, sans-serif; letter-spacing: 0.1em; text-shadow: 1px 1px 0px rgba(0,0,0,0.2); }
+        .handwritten { font-family: 'KaiTi', 'STKaiti', serif; font-weight: bold; }
+        
+        /* LaTeX 字体微调 */
+        mjx-container { font-size: 105% !important; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <header class="bg-slate-900 text-white px-3 py-2 flex justify-between items-center z-20 shadow-md shrink-0 h-14 relative">
+        <div class="flex items-center gap-2">
+            <span class="bg-gradient-to-r from-blue-500 to-indigo-600 px-2 py-1 rounded text-xs font-bold shadow-sm">Problem 3</span>
+        </div>
+        
+        <div class="absolute left-1/2 transform -translate-x-1/2 text-xl md:text-2xl font-bold text-white tracking-widest handwritten text-center whitespace-nowrap drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+            陈老师手搓数理化
+        </div>
+        
+        <div class="hidden sm:block border border-white/80 bg-white/10 px-2 py-0.5 rounded brand-text text-lg text-white">
+            CHEN HUB
+        </div>
+    </header>
+
+    <div class="flex-grow flex flex-col lg:flex-row overflow-hidden">
+        
+        <div class="w-full lg:w-[450px] h-[35vh] lg:h-auto bg-white border-b lg:border-r border-slate-200 z-10 overflow-y-auto shadow-sm flex-none p-5 space-y-5">
+            
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
+                <div class="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">题目回顾</div>
+                <div class="text-sm text-slate-800 leading-relaxed font-medium">
+                    已知双曲线 \(C\) 右焦点 \(F\)，点 \(P(3,1)\) 在 \(C\) 上，\(Q\) 为 \(P\) 关于原点对称点，且 \(\vec{FP}\cdot\vec{FQ}=6\)。<br>
+                    (1) 求 \(C\) 方程；<br>
+                    (2) 设 \(l\) 交 \(C\) 于 \(A,B\)，\(D\) 与 \(B\) 关于原点对称。若 \(PA \perp PD\)，证 \(l\) 斜率为定值。
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="relative pl-4 border-l-2 border-blue-500">
+                    <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">Step 1: 求双曲线方程</h3>
+                    <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                        <p>由 \(P(3,1)\) 知 \(Q(-3,-1)\)，\(F(c,0)\)。</p>
+                        <p>\(\vec{FP}=(3-c, 1), \vec{FQ}=(-3-c, -1)\)。</p>
+                        <p>积 \(= -(9-c^2)-1 = c^2-10\)。</p>
+                        <p>由 \(c^2-10=6 \Rightarrow c^2=16 \Rightarrow a^2+b^2=16\)。</p>
+                        <p>代入 \(P\) 点：\(\frac{9}{a^2} - \frac{1}{16-a^2} = 1\)，解得 \(a^2=8\)。</p>
+                        <p>∴ 方程为 <span class="font-bold text-blue-700">\(x^2 - y^2 = 8\)</span>。</p>
+                    </div>
+                </div>
+
+                <div class="relative pl-4 border-l-2 border-slate-300">
+                    <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">Step 2: 向量垂直转化</h3>
+                    <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                        <p>设 \(A(x_1,y_1), B(x_2,y_2)\)，则 \(D(-x_2,-y_2)\)。</p>
+                        <p>\(PA \perp PD \Rightarrow \vec{PA} \cdot \vec{PD} = 0\)。</p>
+                        <p>\((x_1-3)(-x_2-3) + (y_1-1)(-y_2-1) = 0\)。</p>
+                        <p>整理得：\((x_1x_2+y_1y_2) + 3(x_1-x_2) + (y_1-y_2) - 10 = 0\)。</p>
+                    </div>
+                </div>
+
+                <div class="relative pl-4 border-l-2 border-slate-300">
+                    <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">Step 3: 韦达定理</h3>
+                    <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                        <p>设 \(l: y=kx+m\)，联立 \(x^2-y^2=8\)：</p>
+                        <p>\((1-k^2)x^2 - 2kmx - (m^2+8) = 0\)。</p>
+                        <p>\(x_1+x_2 = \frac{2km}{1-k^2}, \quad x_1x_2 = \frac{-(m^2+8)}{1-k^2}\)。</p>
+                    </div>
+                </div>
+
+                <div class="relative pl-4 border-l-2 border-green-500 bg-green-50/50 rounded-r p-2">
+                    <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">Step 4: 定值求解</h3>
+                    <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                        <p>代入化简得恒等式：</p>
+                        <p>\(\frac{2k^2-18}{1-k^2} + (3+k)(x_1-x_2) = 0\)。</p>
+                        <p>要使式子对任意 \(m\) 成立，需：</p>
+                        <p>\(2k^2-18=0\) 且 \(3+k=0\)。</p>
+                        <p class="font-bold text-green-700 text-center text-lg mt-2">解得 \(k = -3\)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="h-10"></div>
+        </div>
+
+        <div class="flex-grow flex flex-col bg-slate-50 h-full relative">
+            
+            <div class="bg-white border-b border-slate-200 px-4 py-3 shadow-sm z-10 shrink-0 flex items-center gap-4">
+                <label class="text-xs font-bold text-slate-500 whitespace-nowrap flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    拖动截距 m
+                </label>
+                <div class="flex-grow relative">
+                    <input type="range" id="m-slider" min="9" max="20" step="0.1" value="10" class="w-full">
+                </div>
+                <span id="val-m" class="font-mono text-xs font-bold text-white bg-blue-500 px-2 py-1 rounded min-w-[3rem] text-center">10.0</span>
+            </div>
+
+            <div class="flex-grow relative w-full bg-white overflow-hidden">
+                <div id="plotDiv" class="w-full h-full"></div>
+                
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md bg-slate-900/90 backdrop-blur text-white px-4 py-3 rounded-xl shadow-2xl flex justify-between items-center border border-slate-700 pointer-events-none z-20">
+                    
+                    <div class="flex flex-col items-center flex-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">直线方程 (k=-3)</span>
+                        <span class="font-mono font-bold text-yellow-400 text-base sm:text-lg" id="line-eq">y = -3x + 10</span>
+                    </div>
+                    
+                    <div class="h-8 w-px bg-slate-600 mx-2"></div>
+                    
+                    <div class="flex flex-col items-center flex-1">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">点积 \(\vec{PA}\cdot\vec{PD}\)</span>
+                        <span class="font-mono font-bold text-green-400 text-base sm:text-lg" id="dot-prod">0.00</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="absolute bottom-1 right-2 text-[10px] text-slate-300 pointer-events-none">Powered by CHEN HUB</div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        const logoSrc = "__LOGO_PLACEHOLDER__"; 
+        const P = {x: 3, y: 1};
+        const k = -3; // 题目算出的定值
+
+        // 双曲线数据生成 x^2 - y^2 = 8
+        function getHyperbolaData() {
+            let xl=[], yl=[], xr=[], yr=[];
+            for(let t=-2.4; t<=2.4; t+=0.1) {
+                const val = Math.sqrt(8);
+                const x_val = val * Math.cosh(t);
+                const y_val = val * Math.sinh(t);
+                xr.push(x_val); yr.push(y_val);     
+                xl.push(-x_val); yl.push(y_val);    
+            }
+            return {xl, yl, xr, yr};
+        }
+
+        const layout = {
+            margin: {l:30, r:20, t:20, b:80}, // 底部留白给 HUD
+            xaxis: {range:[-12, 12], zeroline:true, gridcolor:'#f1f5f9'},
+            yaxis: {range:[-8, 8], scaleanchor:"x", scaleratio:1, gridcolor:'#f1f5f9'},
+            showlegend: false,
+            hovermode: 'closest',
+            plot_bgcolor: '#ffffff',
+            dragmode: 'pan',
+            images: logoSrc ? [{
+                source: logoSrc,
+                xref:"paper", yref:"paper", x:0.5, y:0.5,
+                sizex:0.5, sizey:0.5, opacity:0.06, layer:"below",
+                xanchor:"center", yanchor:"middle"
+            }] : []
+        };
+        const config = {responsive:true, displayModeBar:false};
+        
+        Plotly.newPlot('plotDiv', [], layout, config);
+
+        function update() {
+            const m = parseFloat(document.getElementById('m-slider').value);
+            
+            // 求解直线 y = -3x + m 与 x^2 - y^2 = 8 的交点
+            // x^2 - (-3x+m)^2 = 8 => -8x^2 + 6mx - m^2 - 8 = 0
+            // => 8x^2 - 6mx + m^2 + 8 = 0
+            const a_coeff = 8;
+            const b_coeff = -6 * m;
+            const c_coeff = m * m + 8;
+            const delta = b_coeff*b_coeff - 4*a_coeff*c_coeff; // 36m^2 - 32(m^2+8) = 4m^2 - 256
+            
+            let Ax, Ay, Bx, By, Dx, Dy;
+            let showPoints = false;
+            let dotProduct = 0;
+
+            if (delta >= 0) {
+                showPoints = true;
+                const sqrtDelta = Math.sqrt(delta);
+                const x1 = (-b_coeff - sqrtDelta) / (2*a_coeff);
+                const x2 = (-b_coeff + sqrtDelta) / (2*a_coeff);
+                const y1 = k*x1 + m;
+                const y2 = k*x2 + m;
+                
+                Ax = x1; Ay = y1;
+                Bx = x2; By = y2;
+                Dx = -x2; Dy = -y2; // D是B关于原点对称
+                
+                // 向量计算
+                const PAx = Ax - 3; const PAy = Ay - 1;
+                const PDx = Dx - 3; const PDy = Dy - 1;
+                dotProduct = PAx * PDx + PAy * PDy;
+            }
+
+            // 更新 UI
+            document.getElementById('val-m').innerText = m.toFixed(1);
+            document.getElementById('line-eq').innerText = `y = -3x + ${m.toFixed(1)}`;
+            
+            const dotDisplay = Math.abs(dotProduct) < 0.001 ? "0.00 (垂直)" : dotProduct.toFixed(2);
+            const dotColor = Math.abs(dotProduct) < 0.001 ? "text-green-400" : "text-red-400";
+            document.getElementById('dot-prod').innerText = dotDisplay;
+            document.getElementById('dot-prod').className = `font-mono font-bold text-base sm:text-lg ${dotColor}`;
+
+            // 绘图
+            const curve = getHyperbolaData();
+            const traceData = [
+                {x:curve.xl, y:curve.yl, mode:'lines', line:{color:'#94a3b8', width:2}, hoverinfo:'skip'},
+                {x:curve.xr, y:curve.yr, mode:'lines', line:{color:'#94a3b8', width:2}, hoverinfo:'skip'},
+                {x:[-10, 15], y:[k*(-10)+m, k*15+m], mode:'lines', line:{color:'#cbd5e1', dash:'longdash'}, hoverinfo:'skip'},
+                {x:[3], y:[1], mode:'markers+text', text:['P'], textposition:'top right', marker:{color:'#f59e0b', size:8}},
+            ];
+
+            if(showPoints) {
+                // 连接 PA, PD
+                traceData.push({
+                    x: [Ax, 3, Dx], y: [Ay, 1, Dy], mode: 'lines',
+                    line: {color: '#ef4444', width: 2.5}, hoverinfo: 'skip'
+                });
+                // 标记点
+                traceData.push({
+                    x: [Ax, Bx, Dx], y: [Ay, By, Dy], mode: 'markers+text',
+                    text: ['A', 'B', 'D'], textposition: 'bottom right',
+                    marker: {color: '#3b82f6', size: 7}
+                });
+            }
+
+            Plotly.react('plotDiv', traceData, layout, config);
+        }
+
+        document.getElementById('m-slider').addEventListener('input', update);
+        window.addEventListener('resize', ()=>Plotly.Plots.resize('plotDiv'));
+        setTimeout(update, 100);
+    </script>
+</body>
+</html>
+"""
+
+# 生成文件
+final_html = html_content.replace("__PAGE_TITLE__", page_title)
+final_html = final_html.replace("__LOGO_PLACEHOLDER__", logo_src)
+
+with open(output_filename, "w", encoding="utf-8") as f:
+    f.write(final_html)
+
+print(f"✅ 最终修正版文件已生成: {os.path.abspath(output_filename)}")
