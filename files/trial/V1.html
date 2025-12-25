@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>四棱锥综合问题 · 可视化全解</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background-color: #f8fafc; margin: 0; overflow: hidden; }
+        .handwritten { font-family: 'KaiTi', 'STKaiti', serif; font-weight: bold; }
+        
+        .label-3d {
+            color: #0f172a; font-family: Arial, sans-serif; font-weight: bold; font-size: 14px;
+            text-shadow: 0 0 4px white; pointer-events: none; user-select: none;
+        }
+        
+        .axis-label { font-family: 'Times New Roman', serif; font-style: italic; font-weight: 900; font-size: 16px; text-shadow: 0 0 3px white; }
+        
+        #bg-logo {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60%; opacity: 0.05; pointer-events: none; z-index: 0; filter: grayscale(100%);
+        }
+
+        #coord-panel {
+            position: absolute; top: 10px; left: 10px; z-index: 20;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px);
+            padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1);
+            font-family: 'Menlo', 'Monaco', monospace; font-size: 10px; color: #334155;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); pointer-events: none;
+        }
+        .coord-row { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 2px; }
+        .coord-name { font-weight: 800; color: #2563eb; }
+
+        .ctrl-btn {
+            @apply px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-slate-600 shadow-sm active:bg-slate-100 transition-colors whitespace-nowrap flex items-center gap-1;
+        }
+        .ctrl-btn.active { @apply bg-blue-600 text-white border-blue-600 shadow-md; }
+        
+        mjx-container { font-size: 105% !important; }
+    </style>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
+</head>
+<body class="h-screen flex flex-col">
+
+    <header class="bg-slate-900 text-white px-3 py-2 flex justify-between items-center z-50 shadow-md shrink-0 h-12">
+        <div class="flex items-center gap-2">
+            <span class="bg-gradient-to-r from-emerald-500 to-teal-600 px-2 py-0.5 rounded text-xs font-bold shadow-sm">Test 2.0</span>
+        </div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 text-lg font-bold handwritten">陈老师手搓数理化</div>
+        <div class="hidden sm:block text-xs opacity-80 font-bold tracking-widest">CHEN HUB</div>
+    </header>
+
+    <div class="flex-grow flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <div class="w-full h-[35vh] lg:h-auto lg:w-[450px] bg-white border-b lg:border-r border-slate-200 z-20 overflow-y-auto shadow-sm flex-none p-4 relative order-1 lg:order-1">
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 shadow-sm mb-4">
+                <div class="text-[10px] font-bold text-blue-500 mb-1 uppercase tracking-wider">题目</div>
+                <div class="text-xs text-slate-800 leading-relaxed font-medium">
+                    
+如图，在四棱锥 \(P-ABCD\) 中，\(PA \perp\) 平面 \(ABCD\)，底面 \(ABCD\) 是直角梯形。<br>
+其中 \(AD // BC\)，\(AB \perp AD\)。<br>
+已知 \(PA=4\)，\(AB=AD=\frac{1}{2}BC=2\)，\(E\) 为棱 \(BC\) 上点，且 \(BE=\frac{1}{4}BC\)。<br>
+(1) 求证：\(DE \perp\) 平面 \(PAC\)；<br>
+(2) 求二面角 \(A-PC-D\) 的余弦值；<br>
+(3) 求点 \(E\) 到平面 \(PCD\) 的距离。
+
+                </div>
+            </div>
+            
+    <div class="relative pl-4 border-l-2 border-blue-500 mb-4">
+        <h3 class="text-sm font-bold text-slate-900 mb-1">Step 1: 空间直角坐标系构建</h3>
+        <div class="text-xs text-slate-600 space-y-1 leading-relaxed">
+            
+        <span class="text-blue-600 font-bold">👉 如图建系 (红x, 蓝y, 绿z)</span><br>
+        以 \(A\) 为原点，\(AB, AD, AP\) 所在直线分别为 \(x, y, z\) 轴。<br>
+        <div class="bg-slate-50 p-2 mt-1 rounded border border-slate-200 text-xs font-mono grid grid-cols-2 gap-1">
+        <div>A(0,0,0)</div><div>P(0,0,4)</div>
+        <div>B(2,0,0)</div><div>D(0,2,0)</div>
+        <div>C(2,4,0)</div><div>E(2,1,0)</div>
+        </div>
+        <div class="text-[10px] text-gray-400 mt-1">注: \(BC=4, BE=1\)，故 \(E\) 在 \(B\) 点 \(y\) 方向加1</div>
+    
+        </div>
+    </div>
+    
+    <div class="relative pl-4 border-l-2 border-purple-500 mb-4">
+        <h3 class="text-sm font-bold text-slate-900 mb-1">Step 2: (1) 证明 DE ⊥ 平面 PAC</h3>
+        <div class="text-xs text-slate-600 space-y-1 leading-relaxed">
+            
+        \(\vec{DE} = (2, -1, 0)\)，平面 \(PAC\) 关键向量：<br>
+        \(\vec{AP} = (0, 0, 4)\)，\(\vec{AC} = (2, 4, 0)\)<br>
+        计算点积：<br>
+        1. \(\vec{DE} \cdot \vec{AP} = 2\times0 + (-1)\times0 + 0 = 0 \Rightarrow DE \perp AP\)<br>
+        2. \(\vec{DE} \cdot \vec{AC} = 2\times2 + (-1)\times4 + 0 = 4-4=0 \Rightarrow DE \perp AC\)<br>
+        <span class="font-bold text-purple-700">\(\therefore DE \perp\) 平面 \(PAC\)</span>
+    
+        </div>
+    </div>
+    
+    <div class="relative pl-4 border-l-2 border-slate-500 mb-4">
+        <h3 class="text-sm font-bold text-slate-900 mb-1">Step 3: (2) 二面角 A-PC-D 余弦值</h3>
+        <div class="text-xs text-slate-600 space-y-1 leading-relaxed">
+            
+        1. 面 \(PAC\) 法向量 \(\vec{n_1}\)：由(1)知 \(\vec{DE} \perp\) 面 \(PAC\)<br>
+           故取 \(\vec{n_1} = \vec{DE} = (2, -1, 0)\)。<br>
+        2. 面 \(PCD\) 法向量 \(\vec{n_2}\)：<br>
+           \(\vec{PD}=(0,2,-4), \vec{CD}=(-2,-2,0)\)。<br>
+           设 \(\vec{n_2}=(x,y,z)\)，解得 \(\vec{n_2} = (-2, 2, 1)\)。<br>
+        3. 计算余弦：<br>
+           \(\cos\theta = \frac{|\vec{n_1}\cdot\vec{n_2}|}{|\vec{n_1}||\vec{n_2}|} = \frac{|-4-2|}{ \sqrt{5} \cdot 3 } = \frac{6}{3\sqrt{5}} = \mathbf{\frac{2\sqrt{5}}{5}}\)。
+    
+        </div>
+    </div>
+    
+    <div class="relative pl-4 border-l-2 border-orange-500 mb-4">
+        <h3 class="text-sm font-bold text-slate-900 mb-1">Step 4: (3) 点 E 到平面 PCD 的距离</h3>
+        <div class="text-xs text-slate-600 space-y-1 leading-relaxed">
+            
+        利用向量投影公式 \(d = \frac{|\vec{DE} \cdot \vec{n_2}|}{|\vec{n_2}|}\)<br>
+        <span class="text-[10px] text-gray-500">(注意: 这里向量DE恰好连接E与平面上点D)</span><br>
+        \(\vec{DE} = (2, -1, 0), \vec{n_2} = (-2, 2, 1)\)<br>
+        \(d = \frac{|-4 - 2 + 0|}{3} = \frac{6}{3} = \mathbf{2}\)。
+    
+        </div>
+    </div>
+    
+            <div class="h-8"></div>
+        </div>
+
+        <div class="flex-grow relative bg-slate-50/50 h-full w-full overflow-hidden order-2 lg:order-2 flex flex-col" id="canvas-wrapper">
+            
+            <div class="bg-white/90 backdrop-blur border-b border-slate-200 p-2 z-10 shrink-0 flex gap-2 overflow-x-auto no-scrollbar justify-center lg:justify-start">
+                <button id="btn-rotate" class="ctrl-btn active"><span>🔄</span> 旋转</button>
+                <button id="btn-plane1" class="ctrl-btn border-purple-200 text-purple-700 bg-purple-50">面PAC</button>
+                <button id="btn-plane2" class="ctrl-btn border-orange-200 text-orange-700 bg-orange-50">面PCD</button>
+                <button id="btn-line" class="ctrl-btn border-red-200 text-red-700 bg-red-50"><span>📏</span> 目标线DE</button>
+                <button id="btn-reset" class="ctrl-btn bg-slate-100 text-slate-500">复位</button>
+            </div>
+
+            <div id="canvas-container" class="flex-grow relative w-full overflow-hidden">
+                <img id="bg-logo" src="" alt="Watermark">
+                <div id="coord-panel">
+                    <div class="border-b border-slate-200 mb-1 pb-1 font-bold text-slate-700">建系坐标 (A为原点)</div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-2 right-2 text-[10px] text-slate-300 pointer-events-none select-none z-10">Powered by CHEN HUB</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        let scene, camera, renderer, labelRenderer, controls;
+        let mainGroup;
+        let isRotating = true;
+
+        // 坐标映射: Math (x, y, z) -> Three (x, z, y)
+        // Math: A(0,0,0), P(0,0,4)[z], B(2,0,0)[x], D(0,2,0)[y]
+        // Three: Red=X(Math X), Blue=Z(Math Y), Green=Y(Math Z)
+        
+        const pointData = {
+            A: { pos: [0, 0, 0], label: "A" },   // 原点
+            B: { pos: [2, 0, 0], label: "B" },   // x轴
+            D: { pos: [0, 0, 2], label: "D" },   // z轴 (Math y)
+            P: { pos: [0, 4, 0], label: "P" },   // y轴 (Math z)
+            C: { pos: [2, 0, 4], label: "C" },   // B + (0,4,0)_math -> B + (0,0,4)_three
+            E: { pos: [2, 0, 1], label: "E" }    // B + 1/4 BC
+        };
+
+        // 显示用的坐标 (对应 Step 1 中的数学坐标)
+        const listData = [
+            {n:"A", c:"(0,0,0)"}, 
+            {n:"B", c:"(2,0,0)"}, 
+            {n:"D", c:"(0,2,0)"}, 
+            {n:"P", c:"(0,0,4)"}, 
+            {n:"C", c:"(2,4,0)"}, 
+            {n:"E", c:"(2,1,0)"}
+        ];
+
+        function init() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            
+            // 调整相机初始位置，获得最佳观察视角
+            camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(8, 6, 8);
+            camera.lookAt(1, 1, 1);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize(container.clientWidth, container.clientHeight);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none';
+            container.appendChild(labelRenderer.domElement);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 5);
+            scene.add(dirLight);
+
+            buildModel();
+            fillCoordPanel();
+            setupUI();
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+            
+            // 初始轻微旋转展示立体感
+            mainGroup.rotation.y = 0.5; 
+        }
+
+        function resetView() {
+            controls.reset();
+            mainGroup.rotation.y = 0.5;
+            camera.position.set(8, 6, 8);
+            camera.lookAt(1, 1, 1);
+        }
+
+        function fillCoordPanel() {
+            const panel = document.getElementById('coord-panel');
+            listData.forEach(d => {
+                const row = document.createElement('div');
+                row.className = 'coord-row';
+                row.innerHTML = `<span class="coord-name">${d.n}</span><span>${d.c}</span>`;
+                panel.appendChild(row);
+            });
+        }
+
+        function buildModel() {
+            mainGroup = new THREE.Group();
+            scene.add(mainGroup);
+
+            // 1. 坐标轴 (对边)
+            // X轴 (红色) -> AB
+            const arrowX = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 4, 0xef4444, 0.2, 0.1);
+            mainGroup.add(arrowX);
+            addLabel("x (AB)", new THREE.Vector3(4.2, 0, 0), "axis-label");
+            
+            // Z轴 (蓝色) -> AD (Math y)
+            const arrowZ = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 6, 0x3b82f6, 0.2, 0.1);
+            mainGroup.add(arrowZ);
+            addLabel("y (AD)", new THREE.Vector3(0, 0, 6.2), "axis-label");
+
+            // Y轴 (绿色) -> AP (Math z)
+            const arrowY = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 6, 0x22c55e, 0.2, 0.1);
+            mainGroup.add(arrowY);
+            addLabel("z (AP)", new THREE.Vector3(0, 6.2, 0), "axis-label");
+
+            // 2. 几何顶点
+            for (const [key, data] of Object.entries(pointData)) {
+                const vec = new THREE.Vector3(...data.pos);
+                const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.08), new THREE.MeshBasicMaterial({ color: 0x1e293b }));
+                sphere.position.copy(vec);
+                mainGroup.add(sphere);
+                addLabel(key, new THREE.Vector3(vec.x, vec.y + 0.15, vec.z), "label-3d");
+            }
+
+            // 3. 棱
+            // 实线: PB, PC, PD, BC, CD
+            const solidEdges = [['P','B'],['P','C'],['P','D'],['B','C'],['C','D']];
+            // 虚线: PA, AB, AD (被遮挡) - 但为了坐标系清晰，AB/AD 可设为轴颜色
+            // 这里为了符合题目“棱”的概念，统一画黑线，用轴线区分方向
+            const allEdges = [
+                ['P','A'], ['P','B'], ['P','C'], ['P','D'],
+                ['A','B'], ['B','C'], ['C','D'], ['D','A']
+            ];
+
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x1e293b, linewidth: 2 });
+            // 虚线材质
+            const dashedMat = new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.2, gapSize: 0.1 });
+
+            allEdges.forEach(pair => {
+                const p1 = new THREE.Vector3(...pointData[pair[0]].pos);
+                const p2 = new THREE.Vector3(...pointData[pair[1]].pos);
+                const geo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+                
+                // 判断是否画虚线: PA, AD, AB (在背面)
+                // 这里简单处理：为了看清坐标轴，PA, AD, AB 用虚线或者细线
+                let isHidden = (pair.includes('A') && (pair.includes('P') || pair.includes('D') || pair.includes('B')));
+                
+                if (isHidden) {
+                    const l = new THREE.Line(geo, dashedMat);
+                    l.computeLineDistances();
+                    mainGroup.add(l);
+                } else {
+                    mainGroup.add(new THREE.Line(geo, lineMat));
+                }
+            });
+
+            // 4. 目标线 DE (红色虚线)
+            const deMat = new THREE.LineDashedMaterial({ color: 0xdc2626, dashSize: 0.3, gapSize: 0.1, linewidth: 3 });
+            const de = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(...pointData.D.pos), 
+                new THREE.Vector3(...pointData.E.pos)
+            ]), deMat);
+            de.computeLineDistances(); de.name = "LineDE"; de.visible = false;
+            mainGroup.add(de);
+
+            // 5. 面
+            const createPlane = (names, color, id) => {
+                const pts = names.map(n => new THREE.Vector3(...pointData[n].pos));
+                const geo = new THREE.BufferGeometry().setFromPoints(pts);
+                geo.setIndex([0,1,2, 0,2,1]); geo.computeVertexNormals();
+                const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.3 }));
+                mesh.name = id; mesh.visible = false;
+                mainGroup.add(mesh);
+            };
+            createPlane(['P','A','C'], 0xa855f7, "PlanePAC"); // 紫色
+            createPlane(['P','C','D'], 0xf97316, "PlanePCD"); // 橙色
+        }
+
+        function addLabel(text, pos, className) {
+            const div = document.createElement('div');
+            div.className = className; div.textContent = text;
+            const label = new CSS2DObject(div);
+            label.position.copy(pos);
+            mainGroup.add(label);
+        }
+
+        function setupUI() {
+            const toggle = (id, objName) => {
+                const btn = document.getElementById(id);
+                btn.addEventListener('touchstart', (e) => e.stopPropagation());
+                btn.addEventListener('click', () => {
+                    const obj = mainGroup.getObjectByName(objName);
+                    if(obj) { obj.visible = !obj.visible; btn.classList.toggle('active'); }
+                });
+            };
+            
+            toggle('btn-line', 'LineDE');
+            toggle('btn-plane1', 'PlanePAC');
+            toggle('btn-plane2', 'PlanePCD');
+
+            document.getElementById('btn-reset').addEventListener('click', resetView);
+            
+            const rotBtn = document.getElementById('btn-rotate');
+            rotBtn.addEventListener('click', () => {
+                isRotating = !isRotating;
+                rotBtn.classList.toggle('active');
+                rotBtn.innerHTML = isRotating ? '<span>🔄</span> 旋转' : '<span>⏹️</span> 已暂停';
+            });
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            labelRenderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            if(isRotating) mainGroup.rotation.y -= 0.002;
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>
