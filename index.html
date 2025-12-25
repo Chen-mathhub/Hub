@@ -2,112 +2,351 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Chen MathHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CHEN HUB | 陈老师教学资源中心</title>
     
     <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" href="icon.png" type="image/png">
-
-    <meta name="apple-mobile-web-app-capable" content="yes">
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <meta name="apple-mobile-web-app-title" content="MathHub">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <style>
-        /* 样式重置：黑底，无边距，无滚动条 */
-        body { margin: 0; overflow: hidden; background-color: #111; }
-        canvas { display: block; width: 100%; height: 100%; }
-        
-        /* 加载提示文字 */
-        #loading {
-            position: absolute; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            color: #888; font-family: sans-serif; font-size: 1rem;
-            pointer-events: none; /* 让鼠标穿透文字直接操作模型 */
-        }
-    </style>
+    <meta name="apple-mobile-web-app-title" content="ChenHub">
+    <link rel="icon" href="logo.png" type="image/png">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* === 字体与配色 === */
+        @font-face { font-family: 'YueYuan'; src: url('造字工房悦圆.ttf') format('truetype'); font-weight: normal; }
+        @font-face { font-family: 'HuangKai'; src: url('字酷堂黄楷体.ttf') format('truetype'); font-weight: normal; }
+
+        :root {
+            --hermes-orange: #F37021;
+            --bg-dark: #000000;
+            --card-dark: rgba(20, 20, 20, 0.85);
+            --text-light: #FFFFFF;
+            --text-gray: #A0A0A0;
+            --input-dark: rgba(255, 255, 255, 0.15);
+            --shadow-dark: 0 40px 80px rgba(0, 0, 0, 0.9);
+            --gold: #FFD700;
+            /* 资源色系 */
+            --pdf-red: #ff4d4f;
+            --mp4-blue: #40a9ff;
+            --html-green: #73d13d;
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, sans-serif; margin: 0; color: var(--text-light); height: 100vh; overflow: hidden; background-color: var(--bg-dark); }
+
+        /* === 视频背景 === */
+        #login-screen { 
+            height: 100%; width: 100%; 
+            display: flex; justify-content: center; align-items: center; 
+            background-color: var(--bg-dark); 
+            position: relative; 
+            overflow-y: auto; 
+        }
+        #bg-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.6; transition: opacity 1s; }
+        #login-screen::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.9)); z-index: 1; pointer-events: none; }
+
+        /* === 登录卡片 === */
+        .login-card { 
+            position: relative; z-index: 10; background: var(--card-dark); 
+            backdrop-filter: blur(40px) saturate(140%); -webkit-backdrop-filter: blur(40px) saturate(140%); 
+            width: 86%; max-width: 380px; 
+            padding: 35px 30px; 
+            border-radius: 32px; 
+            box-shadow: var(--shadow-dark); text-align: center; border: 1px solid rgba(255,255,255,0.12); 
+            margin: 20px 0; 
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === Logo 样式 (圆形版) === */
+        .brand-header img {
+            width: 80px; height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.15); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+        .brand-subtitle {
+            font-family: 'HuangKai', serif;
+            color: #FFFFFF;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+        .brand-subtitle .cn-text { font-size: 24px; letter-spacing: 2px; display: block; }
+        .brand-subtitle .en-text { font-size: 13px; opacity: 0.7; letter-spacing: 1px; font-family: -apple-system, sans-serif; display: block; margin-top: 4px; }
+
+        /* === 滚动公告栏 === */
+        .announcement-bar {
+            background: rgba(243, 112, 33, 0.15); border: 1px solid rgba(243, 112, 33, 0.3);
+            border-radius: 12px; padding: 10px 10px; margin-bottom: 20px;
+            font-size: 13px; color: var(--hermes-orange); display: flex; align-items: center;
+            overflow: hidden; white-space: nowrap; line-height: 1.5;
+        }
+        .announcement-bar marquee { width: 100%; font-weight: 500; }
+
+        /* === 表单区域 === */
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; color: #CCC; font-size: 11px; font-weight: 700; }
+        
+        .password-container { position: relative; width: 100%; }
+        .toggle-password {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: #A0A0A0; font-size: 18px; z-index: 2;
+            transition: color 0.3s;
+        }
+        .toggle-password:hover { color: var(--hermes-orange); }
+
+        select, input { 
+            width: 100%; padding: 14px; border-radius: 14px; border: none; 
+            background: var(--input-dark); font-size: 15px; outline: none; box-sizing: border-box; 
+            color: var(--text-light); font-weight: 500; border: 1px solid rgba(255,255,255,0.08); 
+            transition: all 0.3s ease; text-align: center; 
+        }
+        .password-container input { padding-right: 45px; }
+
+        select:focus, input:focus { 
+            background: rgba(255,255,255,0.2); border-color: var(--hermes-orange);
+            box-shadow: 0 0 15px rgba(243, 112, 33, 0.3); transform: scale(1.01); 
+        }
+        select option { color: #000000; background-color: #FFFFFF; }
+        select { -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+        
+        button.login-btn { 
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #F37021, #d84315); 
+            color: white; border: none; border-radius: 18px; 
+            font-family: 'YueYuan', sans-serif; font-size: 18px; cursor: pointer; margin-top: 10px; 
+            box-shadow: 0 10px 25px rgba(243, 112, 33, 0.4); transition: transform 0.1s; 
+        }
+        button.login-btn:active { transform: scale(0.96); }
+        #loginMsg { color: #ff453a; font-size: 13px; margin-top: 10px; font-weight: bold; min-height: 20px; }
+
+        /* === 营销模块 === */
+        .marketing-section { 
+            margin-top: 20px; 
+            padding-top: 15px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            display: block; 
+        }
+        .marketing-link { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .marketing-link span { color: var(--gold); font-weight: bold; border-bottom: 1px solid rgba(255, 215, 0, 0.3); }
+        .marketing-link:hover span { border-bottom-color: var(--gold); color: #FFF; }
+        #contact-info { display: none; margin-top: 15px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; color: #FFF; border: 1px solid var(--hermes-orange); animation: fadeInUp 0.3s ease; }
+
+        /* === 主界面 (Dark) === */
+        #main-screen { display: none; max-width: 900px; margin: 0 auto; padding: 20px; overflow-y: auto; height: 100vh; box-sizing: border-box; background: #121212; }
+        .header { background: rgba(40,40,40,0.9); backdrop-filter: blur(20px); padding: 15px 25px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2); margin-bottom: 30px; position: sticky; top: 10px; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
+        .class-title { font-family: 'YueYuan', sans-serif; font-size: 24px; color: var(--text-light); margin: 0; }
+        .class-info-tag { font-size: 12px; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; color: var(--text-gray); margin-top: 4px; display: inline-block; }
+        .timeline-title { font-family: 'YueYuan', sans-serif; font-size: 20px; color: var(--hermes-orange); margin-bottom: 20px; }
+        .lesson-card { background: #1E1E1E; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); }
+        .lesson-card.highlight { border-left: 5px solid var(--hermes-orange); background: #252525; }
+        .lesson-topic { font-size: 18px; font-weight: bold; color: var(--text-light); margin-bottom: 10px; }
+        .lesson-note { font-size: 14px; color: #CCC; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; line-height: 1.6; margin-bottom: 20px; }
+        
+        .resource-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .res-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; text-decoration: none; color: var(--text-light); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .res-btn.pdf-file:hover { border-color: var(--pdf-red); color: var(--pdf-red); background: rgba(255, 77, 79, 0.1); }
+        .res-btn.video-file:hover { border-color: var(--mp4-blue); color: var(--mp4-blue); background: rgba(64, 169, 255, 0.1); }
+        .res-btn.html-file:hover { border-color: var(--html-green); color: var(--html-green); background: rgba(115, 209, 61, 0.1); }
+        
+        .logout-btn { background: rgba(255,255,255,0.1); border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; color: var(--text-gray); cursor: pointer; }
+    </style>
 </head>
 <body>
-
-    <div id="loading">正在加载 Chen MathHub...</div>
-
-    <script>
-        // ==========================================
-        //  MathHub 3D 场景逻辑 (Three.js)
-        // ==========================================
+    <div id="login-screen">
+        <video id="bg-video" autoplay muted loop playsinline><source src="tc00.mp4" type="video/mp4"></video>
         
-        // 1. 创建场景
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x111111); // 深灰背景，突出几何体
-
-        // 2. 创建相机
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-
-        // 3. 创建渲染器
-        const renderer = new THREE.WebGLRenderer({ antialias: true }); // 开启抗锯齿，线条更平滑
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio); // 适配 iPad 高清屏
-        document.body.appendChild(renderer.domElement);
-
-        // 4. 添加灯光 (为了让物体有立体感)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // 环境光
-        scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0xffffff, 1);
-        pointLight.position.set(10, 10, 10);
-        scene.add(pointLight);
-
-        // 5. 创建演示物体：一个旋转的“数学结构” (正十二面体 + 线框)
-        const geometry = new THREE.DodecahedronGeometry(1.8);
-        
-        // 材质A：半透明蓝色实体
-        const material = new THREE.MeshPhongMaterial({ 
-            color: 0x0077ff, 
-            transparent: true, 
-            opacity: 0.8,
-            flatShading: true
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-
-        // 材质B：白色线框 (增加数学教学的严谨感)
-        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
-        
-        mesh.add(wireframe); // 把线框套在实体上
-        scene.add(mesh);
-
-        // 6. 动画循环
-        function animate() {
-            requestAnimationFrame(animate);
+        <div class="login-card">
             
-            // 慢慢旋转
-            mesh.rotation.x += 0.005;
-            mesh.rotation.y += 0.01;
+            <div class="brand-header">
+                <img src="logo.png" alt="CHEN HUB Logo">
+            </div>
+            
+            <div class="brand-subtitle">
+                <span class="cn-text">陈老师教学资源中心</span>
+                <span class="en-text">by CHEN HUB@2025</span>
+            </div>
 
-            renderer.render(scene, camera);
+            <div class="announcement-bar">
+                <marquee scrollamount="4">📣 陈老师可视化教学黑科技：拒绝传统“干讲”！独立研发 HTML 动态交互 & Matplotlib 物理实验室，用 Python + Manim 硬核技术流将抽象原理具象化；深度结合 Ebbinghaus 遗忘曲线科学复习。学习数理化，你只管努力！🚀</marquee>
+            </div>
+            
+            <div class="form-group"><label>📅 日期 DATE</label><input type="date" id="loginDate"></div>
+            
+            <div class="form-group">
+                <label>⏰ 时间 TIME</label>
+                <select id="loginTime">
+                    <option value="" disabled selected>选择上课时段...</option>
+                    <optgroup label="☀️ 上午">
+                        <option value="0800">08:00 - 09:30</option>
+                        <option value="0930">09:30 - 11:00</option>
+                        <option value="1100">11:00 - 12:30</option>
+                    </optgroup>
+                    <optgroup label="🌇 下午">
+                        <option value="1430">14:30 - 16:00</option>
+                        <option value="1500">15:00 - 16:30</option>
+                        <option value="1630">16:30 - 18:00</option>
+                        <option value="1800">18:00 - 19:30</option>
+                    </optgroup>
+                    <optgroup label="🌙 晚上">
+                        <option value="1930">19:30 - 21:00</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>🔑 访问密码 PASSWORD</label>
+                <div class="password-container">
+                    <input type="password" id="passwordInput" placeholder="输入密码，你只管努力！">
+                    <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+                </div>
+            </div>
+            
+            <button class="login-btn" onclick="attemptLogin()">🚀 开启自律模式</button>
+            <div id="loginMsg"></div>
+
+            <div class="marketing-section">
+                <div class="marketing-link" onclick="toggleContact()">
+                    没有密码？ <span>联系陈老师获取权限 ➙</span>
+                </div>
+                <div id="contact-info">
+                    <strong>🎓 预约试听 / 课程咨询</strong><br>
+                    微信：CHEN_HUB<br>
+                    电话：18976041291<br>
+                    <span style="font-size:12px;color:#999">(点击任意处关闭)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-screen">
+        <div class="header">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <img src="logo.png" style="width:40px;height:40px;border-radius:50%;border:2px solid #333;"> 
+                <div><div class="class-title-container"><h1 class="class-title" id="displayClassName">...</h1></div><div class="class-info-tag" id="loginInfoTag"></div></div>
+            </div>
+            <button class="logout-btn" onclick="location.reload()">退出</button>
+        </div>
+        <div class="timeline-title">📂 课程档案</div>
+        <div id="lessonContainer"></div>
+        <p style="text-align:center; color:#666; font-size:12px; margin-top:50px;">Designed by Chen Teacher © 2025</p>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+        // 视频播放列表逻辑
+        const playlist = ['tc00.mp4', 'tc01.mp4', 'tc02.mp4', 'tc03.mp4']; 
+        let currentVideo = 0;
+        const videoPlayer = document.getElementById('bg-video');
+        videoPlayer.onended = function() {
+            currentVideo = (currentVideo + 1) % playlist.length;
+            videoPlayer.src = playlist[currentVideo];
+            videoPlayer.play();
+        };
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('passwordInput');
+            const icon = document.querySelector('.toggle-password');
+            if (pwdInput.type === "password") { pwdInput.type = "text"; icon.textContent = "🔒"; } 
+            else { pwdInput.type = "password"; icon.textContent = "👁️"; }
         }
-        
-        // 隐藏加载文字，开始动画
-        document.getElementById('loading').style.display = 'none';
-        animate();
 
-        // 7. 窗口大小自适应 (iPad 横竖屏切换时自动调整)
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        
-        // 8. 交互交互优化：在 iPad 上禁止手指拖动整个网页 (橡皮筋效果)
-        document.body.addEventListener('touchmove', function(e) { 
-            e.preventDefault(); 
-        }, { passive: false });
+        document.getElementById('loginDate').valueAsDate = new Date();
 
+        function attemptLogin() {
+            const date = document.getElementById('loginDate').value;
+            const timeSlot = document.getElementById('loginTime').value;
+            const pwd = document.getElementById('passwordInput').value;
+            const msg = document.getElementById('loginMsg');
+            
+            if(!timeSlot || !pwd) { msg.innerText = "请完整填写日期、时间与密码"; return; }
+            // 检查 data.js 是否加载成功
+            if(typeof COURSE_DB === 'undefined') { msg.innerText = "系统错误 (找不到 data.js 数据文件)"; return; }
+
+            let foundLesson = null;
+            let foundClassName = "";
+
+            // 遍历课程数据查找匹配项
+            for (let group of COURSE_DB) {
+                const match = group.lessons.find(l => l.date === date && l.timeSlot === timeSlot && l.password === pwd);
+                if (match) {
+                    foundLesson = match;
+                    foundClassName = group.name;
+                    break;
+                }
+            }
+
+            if(foundLesson) {
+                const renderData = { name: foundClassName, lessons: [foundLesson] };
+                loadDashboard(renderData, date, timeSlot);
+            } else {
+                msg.innerText = "❌ 未找到课程 (请检查信息是否正确)";
+            }
+        }
+
+        function loadDashboard(courseData, date, timeSlot) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('displayClassName').innerText = courseData.name;
+            let displayTimeStr = timeSlot;
+            if(courseData.lessons[0] && courseData.lessons[0].displayTime) {
+                displayTimeStr = courseData.lessons[0].displayTime;
+            }
+            document.getElementById('loginInfoTag').innerText = `${date} ${displayTimeStr} · 登录成功`;
+            renderLessons(courseData.lessons);
+        }
+
+        function renderLessons(lessons) {
+            const container = document.getElementById('lessonContainer'); container.innerHTML = '';
+            lessons.forEach(l => {
+                let filesHtml = '';
+                if(l.folder && l.simpleFiles) {
+                    filesHtml = '<div class="resource-grid">';
+                    l.simpleFiles.forEach(fileStr => {
+                        let parts = fileStr.split('|');
+                        let fileName = parts[0].trim();
+                        let displayName = parts.length > 1 ? parts[1].trim() : "";
+                        let icon = '📄';
+                        let fileTypeClass = ''; 
+                        if(!displayName) {
+                            if(fileName.match(/\.pdf$/i)) { displayName = "课堂内容解析"; icon = '📕'; fileTypeClass = 'pdf-file'; }
+                            else if(fileName.match(/\.mp4$/i)) { displayName = "视频解析"; icon = '🎬'; fileTypeClass = 'video-file'; }
+                            else if(fileName.match(/\.html$/i)) { displayName = "交互题型"; icon = '🌐'; fileTypeClass = 'html-file'; }
+                            else { displayName = fileName; }
+                        } else {
+                            if(fileName.match(/\.pdf$/i)) { icon = '📕'; fileTypeClass = 'pdf-file'; }
+                            else if(fileName.match(/\.mp4$/i)) { icon = '🎬'; fileTypeClass = 'video-file'; }
+                            else if(fileName.match(/\.html$/i)) { icon = '🌐'; fileTypeClass = 'html-file'; }
+                        }
+                        let fullUrl = `files/${l.folder}/${fileName}`;
+                        filesHtml += `<a href="${fullUrl}" target="_blank" class="res-btn ${fileTypeClass}">${icon} ${displayName}</a>`;
+                    });
+                    filesHtml += '</div>';
+                }
+                const highlightClass = 'highlight';
+                const tag = '<span style="color:#F37021;font-weight:bold;margin-left:10px;font-size:12px;">👈 当前课程</span>';
+                const timeStr = l.displayTime ? `<span style="margin-left:8px; opacity:0.8;">⏰ ${l.displayTime}</span>` : '';
+
+                container.innerHTML += `
+                    <div class="lesson-card ${highlightClass}">
+                        <div class="lesson-meta"><span style="color:#A0A0A0;font-size:13px;font-weight:bold;">📅 ${l.date} ${timeStr} ${tag}</span></div>
+                        <div class="lesson-topic">${l.topic}</div>
+                        <div class="lesson-note">${l.note}</div>
+                        ${filesHtml}
+                    </div>`;
+            });
+        }
+
+        function toggleContact() {
+            const el = document.getElementById('contact-info');
+            if(el.style.display === 'block') el.style.display = 'none';
+            else el.style.display = 'block';
+        }
+        document.getElementById('contact-info').onclick = function() { this.style.display = 'none'; }
     </script>
 </body>
 </html>
