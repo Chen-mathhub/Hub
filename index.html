@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CHEN HUB | 陈老师教学资源中心</title>
     
     <link rel="apple-touch-icon" href="icon.png">
@@ -31,16 +31,26 @@
 
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, sans-serif; margin: 0; color: var(--text-light); height: 100vh; overflow: hidden; background-color: var(--bg-dark); }
 
+        /* === 登录背景 === */
         #login-screen { 
             height: 100%; width: 100%; 
-            display: flex; justify-content: center; align-items: center; 
+            display: flex; 
+            flex-direction: column;
+            /* 居中偏上布局，防止遮挡 Logo */
+            justify-content: center; 
+            align-items: center; 
+            
             background-color: #121212; 
             background-image: url('icon01.png'); 
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
             position: relative; 
-            overflow-y: auto; 
+            overflow: hidden; 
+            
+            /* 顶部预留安全距离 */
+            padding-top: 50px; 
+            box-sizing: border-box;
         }
         
         #bg-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; }
@@ -49,68 +59,82 @@
         .login-card { 
             position: relative; z-index: 10; background: var(--card-dark); 
             backdrop-filter: blur(40px) saturate(140%); -webkit-backdrop-filter: blur(40px) saturate(140%); 
-            width: 86%; max-width: 380px; 
-            padding: 35px 30px; 
-            border-radius: 32px; 
+            width: 86%; max-width: 360px; 
+            padding: 25px 25px; 
+            border-radius: 28px; 
             box-shadow: var(--shadow-dark); text-align: center; border: 1px solid rgba(255,255,255,0.12); 
-            margin: 20px 0; 
+            
+            /* 底部留白 */
+            margin-bottom: 30px;
+            max-height: 95vh;
+            
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .brand-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 10px; }
-        .brand-subtitle { font-family: 'HuangKai', serif; color: #FFFFFF; margin-bottom: 25px; line-height: 1.4; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        .brand-subtitle .cn-text { font-size: 24px; letter-spacing: 2px; display: block; }
-        .brand-subtitle .en-text { font-size: 13px; opacity: 0.7; letter-spacing: 1px; font-family: -apple-system, sans-serif; display: block; margin-top: 4px; }
+        .brand-header img { 
+            width: 70px; height: 70px; 
+            border-radius: 50%; object-fit: cover; 
+            border: 3px solid rgba(255,255,255,0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+            margin-bottom: 8px; 
+        }
+        .brand-subtitle { font-family: 'HuangKai', serif; color: #FFFFFF; margin-bottom: 15px; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        .brand-subtitle .cn-text { font-size: 22px; letter-spacing: 2px; display: block; }
+        .brand-subtitle .en-text { font-size: 12px; opacity: 0.7; letter-spacing: 1px; font-family: -apple-system, sans-serif; display: block; margin-top: 2px; }
 
-        /* === 登录页公告栏 === */
+        /* === 公告栏 === */
         .announcement-bar {
             background: rgba(243, 112, 33, 0.15); border: 1px solid rgba(243, 112, 33, 0.3);
-            border-radius: 12px; padding: 10px 0; margin-bottom: 20px;
-            font-size: 13px; color: var(--hermes-orange);
+            border-radius: 10px; padding: 8px 0; 
+            margin-bottom: 15px; 
+            font-size: 12px; color: var(--hermes-orange);
             overflow: hidden; position: relative; white-space: nowrap;
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
             -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
         }
-        .marquee-content { display: inline-block; padding-left: 100%; animation: smoothScroll 15s linear infinite; will-change: transform; }
+        
+        /* 🔥 关键修改：改为 30s，速度变慢 */
+        .marquee-content { display: inline-block; padding-left: 100%; animation: smoothScroll 30s linear infinite; will-change: transform; }
         @keyframes smoothScroll { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; color: #CCC; font-size: 11px; font-weight: 700; }
+        .form-group { margin-bottom: 10px; text-align: left; }
+        .form-group label { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; color: #CCC; font-size: 10px; font-weight: 700; }
         .password-container { position: relative; width: 100%; }
-        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #A0A0A0; font-size: 18px; z-index: 2; }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #A0A0A0; font-size: 16px; z-index: 2; }
         
-        /* 🔥 关键修改：强制居中 Select 和 Option */
         select, input { 
-            width: 100%; padding: 14px; border-radius: 14px; border: none; 
-            background: var(--input-dark); font-size: 15px; outline: none; box-sizing: border-box; 
+            width: 100%; padding: 10px; border-radius: 12px; border: none; 
+            background: var(--input-dark); font-size: 14px; outline: none; box-sizing: border-box; 
             color: var(--text-light); font-weight: 500; 
             border: 1px solid rgba(255,255,255,0.08); 
             transition: all 0.3s ease; 
-            
-            /* 居中核心代码 */
-            text-align: center; 
-            text-align-last: center; /* 适配 iOS Safari */
-            -webkit-appearance: none; /* 去除原生样式，方便控制 */
+            text-align: center; text-align-last: center;
+            -webkit-appearance: none;
         }
-        /* 尝试让下拉选项也居中 (兼容性取决于系统) */
-        optgroup, option { text-align: center; }
-        
         .password-container input { padding-right: 45px; }
         select:focus, input:focus { background: rgba(255,255,255,0.2); border-color: var(--hermes-orange); box-shadow: 0 0 15px rgba(243, 112, 33, 0.3); transform: scale(1.01); }
-        /* 重新加回自定义箭头 */
-        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
         
-        button.login-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #F37021, #d84315); color: white; border: none; border-radius: 18px; font-family: 'YueYuan', sans-serif; font-size: 18px; cursor: pointer; margin-top: 10px; box-shadow: 0 10px 25px rgba(243, 112, 33, 0.4); transition: transform 0.1s; }
+        button.login-btn { 
+            width: 100%; padding: 12px; 
+            background: linear-gradient(135deg, #F37021, #d84315); color: white; border: none; border-radius: 14px; 
+            font-family: 'YueYuan', sans-serif; font-size: 16px; cursor: pointer; 
+            margin-top: 8px; box-shadow: 0 10px 25px rgba(243, 112, 33, 0.4); transition: transform 0.1s; 
+        }
         button.login-btn:active { transform: scale(0.96); }
         
-        button.trial-btn { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ccc; border-radius: 18px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        button.trial-btn { 
+            width: 100%; padding: 10px; 
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #ccc; border-radius: 14px; 
+            font-size: 13px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; 
+        }
         button.trial-btn:hover { background: rgba(255, 255, 255, 0.15); color: #FFF; border-color: #FFF; }
 
-        #loginMsg { color: #ff453a; font-size: 13px; margin-top: 10px; font-weight: bold; min-height: 20px; }
+        #loginMsg { color: #ff453a; font-size: 12px; margin-top: 8px; font-weight: bold; min-height: 18px; }
 
-        .marketing-section { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: block; }
-        .marketing-link { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .marketing-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: block; }
+        .marketing-link { font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .marketing-link span { color: var(--gold); font-weight: bold; border-bottom: 1px solid rgba(255, 215, 0, 0.3); }
         #contact-info { display: none; margin-top: 15px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; color: #FFF; border: 1px solid var(--hermes-orange); animation: fadeInUp 0.3s ease; }
 
@@ -119,33 +143,6 @@
         .class-title { font-family: 'YueYuan', sans-serif; font-size: 24px; color: var(--text-light); margin: 0; }
         .class-info-tag { font-size: 12px; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; color: var(--text-gray); margin-top: 4px; display: inline-block; }
         
-        /* 🔥 翻页公告栏 (修复版) */
-        .flip-notice-bar {
-            background: rgba(243, 112, 33, 0.15); /* 加深了一点背景，更明显 */
-            border: 1px solid rgba(243, 112, 33, 0.3);
-            border-radius: 12px;
-            height: 36px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 90; /* 确保不被遮挡 */
-        }
-        .flip-wrapper { animation: flipUp 6s cubic-bezier(0.4, 0, 0.2, 1) infinite; text-align: center; width: 100%; }
-        .flip-item {
-            height: 36px;
-            line-height: 36px;
-            color: var(--hermes-orange);
-            font-size: 13px;
-            font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-        }
-        @keyframes flipUp {
-            0%, 45% { transform: translateY(0); }
-            50%, 95% { transform: translateY(-36px); }
-            100% { transform: translateY(0); }
-        }
-
         .timeline-title { font-family: 'YueYuan', sans-serif; font-size: 20px; color: var(--hermes-orange); margin-bottom: 20px; }
         .lesson-card { background: #1E1E1E; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); }
         .lesson-card.highlight { border-left: 5px solid var(--hermes-orange); background: #252525; }
@@ -157,13 +154,7 @@
         .res-btn.video-file:hover { border-color: var(--mp4-blue); color: var(--mp4-blue); background: rgba(64, 169, 255, 0.1); }
         .res-btn.html-file:hover { border-color: var(--html-green); color: var(--html-green); background: rgba(115, 209, 61, 0.1); }
         
-        .checkin-btn {
-            background: linear-gradient(135deg, #1d976c, #93f9b9); color: #004d33;
-            border: none; margin-top: 15px; width: 100%; text-align: center;
-            padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(29, 151, 108, 0.3);
-            display: block; text-decoration: none;
-        }
+        .checkin-btn { background: linear-gradient(135deg, #1d976c, #93f9b9); color: #004d33; border: none; margin-top: 15px; width: 100%; text-align: center; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(29, 151, 108, 0.3); display: block; text-decoration: none; }
         .checkin-btn:hover { transform: scale(0.98); opacity: 0.9; }
         
         .trial-qr-container { margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.15); text-align: center; }
@@ -212,7 +203,12 @@
             <div id="loginMsg"></div>
             <div class="marketing-section">
                 <div class="marketing-link" onclick="toggleContact()">没有密码？ <span>联系陈老师获取权限 ➙</span></div>
-                <div id="contact-info"><strong>🎓 预约试听 / 课程咨询</strong><br>微信：CHEN_HUB<br>电话：18976041291<br><span style="font-size:12px;color:#999">(点击任意处关闭)</span></div>
+                <div id="contact-info">
+                    <strong>🎓 预约试听 / 课程咨询</strong><br>
+                    微信：CHEN_HUB<br>
+                    电话：18976041291<br>
+                    <span style="font-size:12px;color:#999">(点击任意处关闭)</span>
+                </div>
             </div>
         </div>
     </div>
@@ -226,10 +222,9 @@
             <button class="logout-btn" onclick="location.reload()">退出</button>
         </div>
         
-        <div class="flip-notice-bar">
-            <div class="flip-wrapper">
-                <div class="flip-item">💪 来得及，考得上，你可以！</div>
-                <div class="flip-item">💡 遇到问题，马上微信问我</div>
+        <div class="announcement-bar" style="margin-bottom:25px; border-color: rgba(243, 112, 33, 0.4);">
+            <div class="marquee-content">
+                📣 来得及，考得上，你可以！💡 遇到问题，马上微信问我。
             </div>
         </div>
 
@@ -276,12 +271,12 @@
                     topic: "陈老师物理可视化 & 交互演示",
                     note: "同学你好！这是为您精选的四份体验资料。体验结束后，长按下方二维码添加老师微信，获取专属学习规划！",
                     folder: "trial",
-                    qrCode: "wechat.png", // 🔥 确保 wechat.png 在根目录
+                    qrCode: "wechat.png", 
                     simpleFiles: [
-                        "立体几何V1.html|🌐 立体几何交互演示 (HTML)",
-                        "数列知识闪卡V2.html|🌐 数列知识闪卡 (HTML)",
-                        "圆锥曲线可视化V1.mp4|🎬 圆锥曲线可视化 (Video)",
-                        "解三角形题型模板V1.pdf|📕 解三角形题型模板 (PDF)"
+                        "V1.html|🌐 立体几何交互演示 (HTML)",
+                        "V2.html|🌐 数列知识闪卡 (HTML)",
+                        "V1.mp4|🎬 圆锥曲线可视化 (Video)",
+                        "V1.pdf|📕 解三角形题型模板 (PDF)"
                     ]
                 }]
             };
@@ -312,7 +307,9 @@
                         if(fileName.match(/\.pdf$/i)) { icon = '📕'; fileTypeClass = 'pdf-file'; }
                         else if(fileName.match(/\.mp4$/i)) { icon = '🎬'; fileTypeClass = 'video-file'; }
                         else if(fileName.match(/\.html$/i)) { icon = '🌐'; fileTypeClass = 'html-file'; }
+                        
                         let fullUrl = `files/${l.folder}/${fileName}`;
+                        
                         filesHtml += `<a href="${fullUrl}" target="_blank" class="res-btn ${fileTypeClass}">${icon} ${displayName}</a>`;
                     });
                     filesHtml += '</div>';
