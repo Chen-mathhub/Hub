@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>导数应用专题：单调区间练习卷</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e67e22; }
+        body { font-family: "Microsoft YaHei", sans-serif; margin: 0; padding: 0; background: #fff; line-height: 1.3; color: #333; }
+        
+        /* 导航栏 */
+        #nav { 
+            position: sticky; top: 0; background: var(--primary); color: white; 
+            padding: 8px 20px; display: flex; justify-content: space-between; 
+            align-items: center; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { background: #3498db; border: none; color: white; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .btn-pdf { background: #27ae60; }
+        
+        .container { max-width: 850px; margin: 0 auto; padding: 10px 30px; }
+        h1 { text-align: center; font-size: 1.25em; margin: 5px 0; border-bottom: 2px solid #333; padding-bottom: 2px; }
+        
+        /* 题目样式 */
+        .q-card { margin-bottom: 8px; padding: 4px 0; border-bottom: 1px dashed #eee; }
+        .q-title { font-weight: bold; font-size: 0.95em; margin-bottom: 3px; }
+        .options { display: flex; flex-wrap: wrap; font-size: 0.9em; padding-left: 15px; }
+        .options div { width: 50%; padding: 1px 0; }
+        
+        /* 模式切换 */
+        .student-mode .ans-section { display: none; }
+        .teacher-mode .ans-section { 
+            display: block; background: #f0f7ff; border-left: 4px solid #3498db; 
+            padding: 8px 12px; margin: 5px 0; border-radius: 4px; font-size: 0.95em; 
+        }
+        .teacher-mode .q-card { border: 1px solid #f0f0f0; padding: 10px; margin-bottom: 15px; border-radius: 6px; }
+        
+        .method-box { background: #fff3e0; border: 1px dashed var(--accent); padding: 5px 10px; margin-bottom: 10px; font-size: 0.85em; }
+        .highlight { color: #c0392b; font-weight: bold; }
+
+        @media print {
+            #nav { display: none !important; }
+            .container { width: 100%; max-width: 100%; margin: 0; padding: 0 10px; }
+            .q-card { page-break-inside: avoid; border-bottom: 1px dashed #ccc; }
+            h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body class="student-mode">
+
+<div id="nav">
+    <div style="font-weight: bold; font-size: 15px;">导数教学助手 - 物理老师版</div>
+    <div class="btn-group">
+        <button class="btn" onclick="toggleMode()" id="mode-btn">切换解析模式</button>
+        <button class="btn btn-pdf" onclick="exportPDF()">保存PDF / 打印</button>
+    </div>
+</div>
+
+<div class="container">
+    <h1 id="main-title">专题：利用导数研究函数的单调区间（练习卷）</h1>
+    
+    <div class="method-box">
+        <strong>【解题规范】</strong> 1. 确定函数定义域；2. 求导数 \( f'(x) \)；3. 解 \( f'(x)>0 \) 得增区间，解 \( f'(x)<0 \) 得减区间（结果必须在定义域内）。
+    </div>
+
+    <div id="q-list">
+        <div class="q-card">
+            <div class="q-title">1. 函数 \( f(x)=(x-3)e^x \) 的单调递增区间是（ ）</div>
+            <div class="options"><div>A. \( (-\infty, 2) \)</div><div>B. \( (2, +\infty) \)</div><div>C. \( (-\infty, 3) \)</div><div>D. \( (3, +\infty) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 求导：\( f'(x) = e^x + (x-3)e^x = (x-2)e^x \)。令 \( f'(x) > 0 \)，由于 \( e^x > 0 \)，得 \( x-2 > 0 \)，即 \( x > 2 \)。故增区间为 <span class="highlight">\( (2, +\infty) \)</span>。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">2. 函数 \( f(x)=2x-5\ln x-4 \) 的单调递减区间是（ ）</div>
+            <div class="options"><div>A. \( (0, 3) \)</div><div>B. \( (3, +\infty) \)</div><div>C. \( (5/2, +\infty) \)</div><div>D. \( (0, 5/2) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 定义域：\( x > 0 \)。求导：\( f'(x) = 2 - \frac{5}{x} = \frac{2x-5}{x} \)。令 \( f'(x) < 0 \)，结合定义域得 <span class="highlight">\( (0, 5/2) \)</span>。选 D。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">3. 函数 \( y=\frac{1}{2}x^2-\ln x + 1 \) 的单调递减区间为（ ）</div>
+            <div class="options"><div>A. \( (-1, 1) \)</div><div>B. \( (0, 1) \)</div><div>C. \( [1, +\infty) \)</div><div>D. \( (0, +\infty) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 定义域：\( x > 0 \)。求导：\( y' = x - \frac{1}{x} = \frac{x^2-1}{x} \)。令 \( y' < 0 \implies x^2 < 1 \)，结合 \( x > 0 \) 得 <span class="highlight">\( (0, 1) \)</span>。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">4. 函数 \( f(x)=x^2+5x+2\ln x \) 的单调递增区间是（ ）</div>
+            <div class="options"><div>A. \( (-\infty, -2) \)</div><div>B. \( (0, +\infty) \)</div><div>C. \( (2, +\infty) \)</div><div>D. \( (-2, 0) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 定义域：\( x > 0 \)。求导：\( f'(x) = 2x + 5 + \frac{2}{x} = \frac{2x^2+5x+2}{x} \)。由于 \( x > 0 \)，\( 2x^2+5x+2 > 0 \) 恒成立，故增区间为 <span class="highlight">\( (0, +\infty) \)</span>。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">5. \( f'(x) \) 为偶函数，\( f(x)=x^3+(a-1)x^2-(a+2)x \)，则其单调递减区间为（ ）</div>
+            <div class="options"><div>A. \( (0, 2) \)</div><div>B. \( (-1, 1) \)</div><div>C. \( (-\sqrt{3}, \sqrt{3}) \)</div><div>D. \( (-3, 3) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 求导：\( f'(x)=3x^2+2(a-1)x-(a+2) \)。因 \( f'(x) \) 为偶函数，得 \( a-1=0 \implies a=1 \)。令 \( f'(x)=3x^2-3 < 0 \implies -1 < x < 1 \)。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">6. 函数 \( f(x)=\frac{1}{x\ln x} \) 的一个单调递减区间是（ ）</div>
+            <div class="options"><div>A. \( (e, +\infty) \)</div><div>B. \( (1/e, +\infty) \)</div><div>C. \( (0, 1/e) \)</div><div>D. \( (1/e, 1) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 定义域：\( x \in (0,1) \cup (1,+\infty) \)。求导：\( f'(x) = -\frac{\ln x + 1}{(x\ln x)^2} \)。令 \( f'(x) < 0 \implies \ln x + 1 > 0 \implies x > 1/e \)。结合定义域选 D。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">7. \( f(x)=x^2-ax+\ln x \) 在区间 \( (1, e) \) 上单调递增，则 \( a \) 的取值范围是（ ）</div>
+            <div class="options"><div>A. \( [3, +\infty) \)</div><div>B. \( (-\infty, 3] \)</div><div>C. \( [3, e^2+1] \)</div><div>D. \( (-\infty, e^2+1] \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> \( f'(x) = 2x - a + \frac{1}{x} \ge 0 \) 在 \( (1, e) \) 上恒成立。即 \( a \le 2x + \frac{1}{x} \)。设 \( g(x) = 2x + \frac{1}{x} \)，其在 \( (1, e) \) 上递增，最小值为 \( g(1)=3 \)。故 <span class="highlight">\( a \le 3 \)</span>。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">8. 函数 \( f(x)=x\ln x-x \) 的单调递增区间是（ ）</div>
+            <div class="options"><div>A. \( (0, 1) \)</div><div>B. \( (1, +\infty) \)</div><div>C. \( (0, e) \)</div><div>D. \( (e, +\infty) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 定义域：\( x > 0 \)。求导：\( f'(x) = \ln x + 1 - 1 = \ln x \)。令 \( \ln x > 0 \implies x > 1 \)。故增区间为 <span class="highlight">\( (1, +\infty) \)</span>。选 B。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">9. \( f(x)=\frac{1}{2}ax^2+\ln x \) 在 \( (1, +\infty) \) 上单调递增，则 \( a \) 的取值范围是（ ）</div>
+            <div class="options"><div>A. \( [-1, +\infty) \)</div><div>B. \( (-1, +\infty) \)</div><div>C. \( [0, +\infty) \)</div><div>D. \( (0, +\infty) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> \( f'(x) = ax + \frac{1}{x} \ge 0 \) 在 \( (1, +\infty) \) 恒成立。即 \( a \ge -1/x^2 \)。由于 \( x > 1 \)，\( -1/x^2 \in (-1, 0) \)。要使不等式恒成立，只需 <span class="highlight">\( a \ge 0 \)</span>。选 C。
+            </div>
+        </div>
+
+        <div class="q-card">
+            <div class="q-title">10. 函数 \( f(x)=x^3-x+2 \) 的单调递减区间是（ ）</div>
+            <div class="options"><div>A. \( (-\infty, -\sqrt{3}/3) \)</div><div>B. \( (\sqrt{3}/3, +\infty) \)</div><div>C. \( (-\sqrt{3}/3, \sqrt{3}/3) \)</div><div>D. \( (-1, 1) \)</div></div>
+            <div class="ans-section">
+                <strong>【解析】</strong> 求导：\( f'(x) = 3x^2 - 1 \)。令 \( 3x^2 - 1 < 0 \implies x^2 < 1/3 \)。解得减区间为 <span class="highlight">\( (-\frac{\sqrt{3}}{3}, \frac{\sqrt{3}}{3}) \)</span>。选 C。
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleMode() {
+        const body = document.body;
+        const btn = document.getElementById('mode-btn');
+        const title = document.getElementById('main-title');
+        if (body.className === 'student-mode') {
+            body.className = 'teacher-mode';
+            btn.innerText = '切换回练习卷模式';
+            title.innerText = '导数应用：单调区间（教师演示版）';
+        } else {
+            body.className = 'student-mode';
+            btn.innerText = '切换至解析模式';
+            title.innerText = '专题：利用导数研究函数的单调区间（练习卷）';
+        }
+    }
+
+    function exportPDF() {
+        if (document.body.className === 'teacher-mode') {
+            if(confirm("当前处于教师模式，建议切换回练习卷模式以获得最佳打印效果，是否继续打印？")) {
+                window.print();
+            }
+        } else {
+            window.print();
+        }
+    }
+</script>
+</body>
+</html>
