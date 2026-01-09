@@ -122,7 +122,7 @@ const COURSE_DB = [
                 password: "OL122901",  // OL(Online) + 1229(日期) + 01(课程编号)
                 topic: "在线答疑与作业辅导",
                 note: "线上实时答疑，可随时提问。请提前准备好问题。",
-                folder: "20251229_Online",
+                folder: "20251229_G3SX_online",
                 simpleFiles: ["常见问题汇总.pdf", "答疑记录.pdf"]
             },
             {
@@ -132,7 +132,7 @@ const COURSE_DB = [
                 password: "OL123001",  // OL(Online) + 1230(日期) + 01(课程编号)
                 topic: "期末冲刺在线课",
                 note: "期末考试重点难点突破。",
-                folder: "20251230_Online",
+                folder: "20251230_G3SX_online",
                 simpleFiles: ["冲刺资料.pdf", "V19.mp4"]
             }
         ]
